@@ -24,7 +24,6 @@ public class AddFabricSrv extends HttpServlet {
         
         String fabricTypeName = request.getParameter("fabricTypeName");
         String color = request.getParameter("color");
-        // double availableMeters = Double.parseDouble(request.getParameter("availableMeters")); // Removed
         Part imagePart = request.getPart("image");
         InputStream image = imagePart.getInputStream();
 

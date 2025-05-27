@@ -228,7 +228,7 @@ if (message != null) {
                     <td><%=String.format("%.2f грн", currAmount)%></td>
                 </tr>
                 <% 
-                    } // Кінець циклу for
+                    }
                 } // Кінець if (cartItems.isEmpty())
                 %>
                 <tr class="total-row">

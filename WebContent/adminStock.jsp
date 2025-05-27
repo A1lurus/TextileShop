@@ -171,6 +171,7 @@ ProductServiceImpl productService = new ProductServiceImpl();
 
             <%
             ProductServiceImpl productDao = new ProductServiceImpl();
+            OrderServiceImpl orderServiceImpl = new OrderServiceImpl(); // Додали ініціалізацію сервісу замовлень
             List<ProductBean> allProducts = productDao.getAllProductsadmin();
             
             // Групуємо товари за категоріями
@@ -230,6 +231,7 @@ ProductServiceImpl productService = new ProductServiceImpl();
                 String stockClass = stock < 5 ? "low-stock" : 
                                  stock < 15 ? "medium-stock" : "high-stock";
                 boolean isHidden = product.getHide();
+                int soldCount = orderServiceImpl.countSoldItem(product.getProdId()); // Отримуємо кількість проданих товарів
         %>
         <tr>
             <td>
@@ -246,7 +248,7 @@ ProductServiceImpl productService = new ProductServiceImpl();
             <td><%=String.format("%.2f", product.getProdPrice())%></td>
             <td><%=product.getFabricType() != null ? product.getFabricType() : "-"%></td>
             <td><%= productService.getSizeNameById(product.getSize()) %></td>
-            <td><%=new OrderServiceImpl().countSoldItem(product.getProdId())%></td>
+            <td><%=soldCount%></td>
             <td class="stock-indicator <%=stockClass%>">
                 <%=stock%>
             </td>
@@ -258,11 +260,22 @@ ProductServiceImpl productService = new ProductServiceImpl();
                     class="btn btn-primary btn-action btn-edit">
                     Змінити
                 </a>
+                <% 
+                // Умова для приховування кнопки "Видалити", якщо soldCount > 0
+                if (soldCount == 0) { 
+                %>
                 <a href="./RemoveProductSrv?prodid=<%=product.getProdId()%>"
                    class="btn btn-danger btn-action btn-delete"
                    onclick="return confirm('Ви впевнені, що хочете видалити цей товар?')">
                    Видалити
                 </a>
+                <% 
+                } else { 
+                %>
+                <button class="btn btn-danger btn-action btn-delete" disabled title="Неможливо видалити, оскільки товар було продано">Видалити</button>
+                <%
+                }
+                %>
             </td>
         </tr>
         <% 

@@ -330,34 +330,7 @@ if (products.isEmpty()) {
     message = "За запитом '" + (search != null ? search : type) + "' нічого не знайдено";
     products = prodDao.getAllProducts(); // Повернути всі товари, якщо нічого не знайдено
 }
-
-// Видалено: Отримання всіх тканин та групування за типом
-// List<FabricBean> allFabrics = fabricService.getAllFabrics();
-// Map<String, List<FabricBean>> fabricsByType = allFabrics.stream()
-// .collect(Collectors.groupingBy(FabricBean::getFabricTypeName));
 %>
-
-<%-- Видалено: Передача даних про тканини в JavaScript --%>
-<%--
-<script>
-// Передаємо дані про тканини в JavaScript
-var allFabricsData = {
-    <% for (Map.Entry<String, List<FabricBean>> entry : fabricsByType.entrySet()) { %>
-        '<%= entry.getKey() %>': [
-            <% for (FabricBean fabric : entry.getValue()) { %>
-                {
-                    fabricId: '<%= fabric.getFabricId() %>',
-                    fabricTypeName: '<%= fabric.getFabricTypeName() %>',
-                    color: '<%= fabric.getColor() %>',
-                    availableMeters: <%= fabric.getAvailableMeters() %>,
-                    imageUrl: './ShowImage?fabricId=<%= fabric.getFabricId() %>'
-                },
-            <% } %>
-        ],
-    <% } %>
-};
-</script>
---%>
 
 <div class="container" style="margin-top: 25px;">
     <% if (type != null) { %>
@@ -526,17 +499,6 @@ $(document).ready(function() {
         form.find('input[name="pid"]').val(productId);
         form.find('input[name="size"]').val(sizeId);
 
-        // Видалено: Оновлення тканин, оскільки функціонал тканини не використовується
-        // updateFabricsForProduct(productRow, fabricType, lastSelectedFabrics[fabricType]);
-    });
-
-    // Видалено: Функція updateFabricsForProduct, оскільки функціонал тканини не використовується
-    /*
-    function updateFabricsForProduct(productRow, fabricType, preselectedFabricId = null) {
-        // ... (весь код функції updateFabricsForProduct) ...
-    }
-    */
-
     $('.product-form').on('submit', function(e) {
         e.preventDefault();
         const form = $(this);
@@ -552,15 +514,7 @@ $(document).ready(function() {
             return false;
         }
 
-        // Видалено: Перевірка fabricId
-        // const fabricId = form.find('input[name="fabricId"]').val();
         const size = form.find('input[name="size"]').val();
-
-        // Видалено: Перевірка fabricId
-        // if (!fabricId) {
-        //     alert('Будь ласка, оберіть тканину');
-        //     return false;
-        // }
         if (!size) {
             alert('Будь ласка, оберіть розмір');
             return false;

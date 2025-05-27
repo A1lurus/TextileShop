@@ -71,14 +71,13 @@ public class ProductServiceImpl implements ProductService {
         return status;
     }
 
-    // Додати цей метод до ProductServiceImpl.java
     public String getSizeNameById(String sizeId) {
         if (sizeId == null || sizeId.isEmpty()) {
             return "-";
         }
         
         SizeBean size = new SizeServiceImpl().getSizeDetails(sizeId);
-        return size != null ? size.getSizeName() : sizeId; // Повертаємо назву або оригінальний ID, якщо розмір не знайдено
+        return size != null ? size.getSizeName() : sizeId;
     }
 
     @Override

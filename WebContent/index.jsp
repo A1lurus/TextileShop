@@ -15,6 +15,41 @@
     src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script
     src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+  
+    <% // Підготовки та отримання даних, які потім будуть відображені на веб-сторінці
+ 	
+	String userName = (String) session.getAttribute("username");
+	ProductServiceImpl prodDao = new ProductServiceImpl();
+	SizeServiceImpl sizeService = new SizeServiceImpl();
+	FabricServiceImpl fabricService = new FabricServiceImpl();
+	
+	List<ProductBean> products = new ArrayList<ProductBean>();
+	String search = request.getParameter("search");
+	String type = request.getParameter("type");
+	String message = "Всі товари";
+	
+	List<String> categories = prodDao.getAllProductTypes();
+	
+	if (search != null) {
+	    products = prodDao.searchAllProducts(search);
+	    message = "Результати пошуку: '" + search + "'";
+	} else if (type != null) {
+	    products = prodDao.getAllProductsByType(type);
+	    message = "Категорія: '" + type + "'";
+	} else {
+	    products = prodDao.getAllProducts();
+	}
+	
+	if (products.isEmpty()) {
+	    message = "За запитом '" + (search != null ? search : type) + "' нічого не знайдено";
+	    products = prodDao.getAllProducts();
+	}
+	
+	// Отримуємо всі тканини один раз
+	List<FabricBean> allFabrics = fabricService.getAllFabrics();
+	Map<String, List<FabricBean>> fabricsByType = allFabrics.stream()
+	    .collect(Collectors.groupingBy(FabricBean::getFabricTypeName));
+	%>
 <style>
     body {
         background-color: #E6F9E6;
@@ -356,39 +391,7 @@
     <p align="center" id="message"></p>
 </div>
 
-<%
-String userName = (String) session.getAttribute("username");
-ProductServiceImpl prodDao = new ProductServiceImpl();
-SizeServiceImpl sizeService = new SizeServiceImpl();
-FabricServiceImpl fabricService = new FabricServiceImpl();
 
-List<ProductBean> products = new ArrayList<ProductBean>();
-String search = request.getParameter("search");
-String type = request.getParameter("type");
-String message = "Всі товари";
-
-List<String> categories = prodDao.getAllProductTypes();
-
-if (search != null) {
-    products = prodDao.searchAllProducts(search);
-    message = "Результати пошуку: '" + search + "'";
-} else if (type != null) {
-    products = prodDao.getAllProductsByType(type);
-    message = "Категорія: '" + type + "'";
-} else {
-    products = prodDao.getAllProducts();
-}
-
-if (products.isEmpty()) {
-    message = "За запитом '" + (search != null ? search : type) + "' нічого не знайдено";
-    products = prodDao.getAllProducts();
-}
-
-// Отримуємо всі тканини один раз
-List<FabricBean> allFabrics = fabricService.getAllFabrics();
-Map<String, List<FabricBean>> fabricsByType = allFabrics.stream()
-    .collect(Collectors.groupingBy(FabricBean::getFabricTypeName));
-%>
 
 <script>
 // Передаємо дані про тканини в JavaScript
@@ -513,7 +516,7 @@ var allFabricsData = {
                     <div class="product-price <%= firstProduct.getProdQuantity() <= 0 ? "out-of-stock" : "" %>">
                         <%=firstProduct.getProdPrice()%> грн
                         <% if (firstProduct.getProdQuantity() <= 0) { %>
-                            <span class="out-of-stock-label">Немає в наявності</span>
+                            <span class="out-of-stock-label">Закриті замовлення</span>
                         <% } %>
                     </div>
                     
@@ -603,7 +606,7 @@ $(document).ready(function() {
         if (!inStock) {
             productRow.find('.product-price').addClass('out-of-stock');
             productRow.find('.out-of-stock-label').remove();
-            productRow.find('.product-price').append('<span class="out-of-stock-label">Немає в наявності</span>');
+            productRow.find('.product-price').append('<span class="out-of-stock-label">Закриті замовлення</span>');
             productRow.find('.btn-action').prop('disabled', true).addClass('btn-disabled');
         } else {
             productRow.find('.product-price').removeClass('out-of-stock');
@@ -642,7 +645,7 @@ $(document).ready(function() {
                     (isSelected ? ' selected' : '') + '" ' +
                     'data-fabric-id="' + fabric.fabricId + '" ' +
                     'data-unique-key="' + uniqueKey + '" ' +
-                    'title="' + (isDisabled ? "Немає в наявності" : fabric.color) + '">' +
+                    'title="' + (isDisabled ? "Закриті замовлення" : fabric.color) + '">' +
                     '<img src="' + fabric.imageUrl + '" ' +
                     'alt="' + fabric.color + '" class="fabric-thumbnail">' +
                     '<span class="fabric-name">' + fabric.color + '</span>' +
@@ -771,13 +774,13 @@ $(document).ready(function() {
         'Ковдра': 'kovdr.jpg',
         'Крісла': 'krislo.jpg',
         'Постільна білизна': 'postil.jpg',
-        'Пледи': 'speaker.jpg', /* Залишив speaker.jpg, якщо у вас немає конкретного для пледів */
+        'Пледи': 'speaker.jpg',
         'Рушники': 'rushnik.jpg'
     };
     
     $('.category-tile').each(function() {
         const category = $(this).data('category');
-        const imageFile = categoryImages[category] || 'noimage.jpg'; // Використовуйте 'noimage.jpg' або інше стандартне зображення, якщо категорія не знайдена
+        const imageFile = categoryImages[category] || 'noimage.jpg';
         $(this).css('--category-bg', 'url(images/' + imageFile + ')');
     });
 });
